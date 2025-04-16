@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        input {
+            padding: 10px;
+            margin: 20px;
+            width: 300px;
+            font-size: 16px;
+        }
+
+        .script-list {
+            margin-top: 20px;
+        }
+
+        .script-item {
+            background-color: #f4f4f4;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .script-item h3 {
+            margin: 0;
+        }
+
+        .script-item p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search for Scripts</h1>
+    <input type="text" id="search-input" placeholder="Search for scripts..." />
+    <div class="script-list" id="script-list"></div>
+
+    <script>
+        // Function to fetch and display scripts based on search query
+        function searchScripts(query) {
+            fetch(`http://localhost:3000/search?query=${query}`)
+                .then(response => response.json())
+                .then(scripts => {
+                    const scriptListContainer = document.getElementById('script-list');
+                    scriptListContainer.innerHTML = '';  // Clear previous results
+
+                    if (scripts.length > 0) {
+                        scripts.forEach(script => {
+                            const scriptItem = document.createElement('div');
+                            scriptItem.classList.add('script-item');
+
+                            const title = document.createElement('h3');
+                            title.textContent = script.name;
+                            scriptItem.appendChild(title);
+
+                            const snippet = document.createElement('p');
+                            snippet.textContent = script.snippet; // Display the full snippet (including loadstring)
+                            scriptItem.appendChild(snippet);
+
+                            scriptListContainer.appendChild(scriptItem);
+                        });
+                    } else {
+                        const noResultsMessage = document.createElement('p');
+                        noResultsMessage.textContent = 'No scripts found.';
+                        scriptListContainer.appendChild(noResultsMessage);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching scripts:', error);
+                });
+        }
+
+        // Add event listener for the search input
+        document.getElementById('search-input').addEventListener('input', (event) => {
+            const query = event.target.value.toLowerCase();
+            searchScripts(query);
+        });
+    </script>
+</body>
+</html>
